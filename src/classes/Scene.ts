@@ -1,11 +1,9 @@
 import * as THREE from 'three';
 import {GUI} from 'dat.gui'
 import Stats from 'stats.js';
-import {UniformData} from "../types/Types.ts";
-import {
-    getFragmentShader,
-    getVertexShader
-} from '../util/Shaders.ts';
+import {UniformData} from '../types/Types.ts';
+import vertexShader from '../shaders/vertex.glsl';
+import fragmentShader from '../shaders/fragment.glsl';
 
 export default class Scene {
     public canvas: HTMLElement | null;
@@ -128,8 +126,8 @@ export default class Scene {
         const material = new THREE.ShaderMaterial({
             uniforms: this.uniformData,
             wireframe: false,
-            vertexShader: getVertexShader(),
-            fragmentShader: getFragmentShader(),
+            vertexShader: vertexShader,
+            fragmentShader: fragmentShader,
         });
         this.box = new THREE.Mesh(geometry, material);
         this.box.castShadow = true;
