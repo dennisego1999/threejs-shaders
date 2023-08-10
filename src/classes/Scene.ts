@@ -1,7 +1,11 @@
 import * as THREE from 'three';
-import {getFragmentShader, getVertexShader} from '../util/Shaders.ts';
 import {GUI} from 'dat.gui'
 import Stats from 'stats.js';
+import {UniformData} from "../types/Types.ts";
+import {
+    getFragmentShader,
+    getVertexShader
+} from '../util/Shaders.ts';
 
 export default class Scene {
     public canvas: HTMLElement | null;
@@ -9,24 +13,35 @@ export default class Scene {
     public camera: THREE.PerspectiveCamera | null;
     public renderer: THREE.WebGLRenderer | null;
     public box: THREE.Mesh | null;
+    public clock: THREE.Clock | null;
 
     private readonly fps: number;
     private then: number;
+    private delta: number;
     private animateFrameId: number;
     private gui: GUI | null;
     private stats: Stats | null;
+    private uniformData: UniformData;
 
     constructor(canvasId: string) {
         this.canvas = document.getElementById(canvasId);
         this.animateFrameId = 0;
         this.then = 0;
+        this.delta = 0;
         this.fps = 1000 / 60;
+        this.clock = null;
         this.gui = null;
         this.stats = null;
         this.scene = null;
         this.camera = null;
         this.renderer = null;
         this.box = null;
+        this.uniformData = {
+            u_time: {
+                type: 'f',
+                value: null,
+            }
+        };
 
         //Call init func
         this.init();
@@ -35,6 +50,9 @@ export default class Scene {
     init() {
         //Set scene
         this.scene = new THREE.Scene();
+
+        //Set clock
+        this.clock = new THREE.Clock();
 
         //Setup external tools
         this.setupExternalTools();
@@ -50,6 +68,9 @@ export default class Scene {
 
         //Setup event listeners
         this.setupEventListeners();
+
+        //Set the initial uniform data u_time value
+        this.uniformData.u_time.value = this.delta;
 
         //Start rendering
         this.animate();
@@ -103,9 +124,10 @@ export default class Scene {
         }
 
         //Create a box
-        const geometry = new THREE.BoxGeometry(2, 2, 2);
+        const geometry = new THREE.BoxGeometry(2, 2, 2, 5, 5, 5);
         const material = new THREE.ShaderMaterial({
-            wireframe: true,
+            uniforms: this.uniformData,
+            wireframe: false,
             vertexShader: getVertexShader(),
             fragmentShader: getFragmentShader(),
         });
@@ -164,6 +186,8 @@ export default class Scene {
             return
         }
 
+        //Update uniform data
+        this.uniformData.u_time.value = this.clock?.getElapsedTime() ?? 0;
 
         if(this.box) {
             //Rotate the box
@@ -180,16 +204,16 @@ export default class Scene {
     animate() {
         //Animate request frame loop
         const now = Date.now();
-        const delta: number = now - this.then;
+        this.delta = now - this.then;
 
         //Begin stats
         this.stats?.begin();
 
-        if (delta > this.fps) {
+        if (this.delta > this.fps) {
             this.then = now;
 
             //Render the frame
-            this.render(delta);
+            this.render(this.delta);
         }
 
         //End stats

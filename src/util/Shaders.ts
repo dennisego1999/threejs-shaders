@@ -1,18 +1,25 @@
 export function getVertexShader() {
     return `
-    void main() {
-        //projectionMatrix, modelViewMatrix, position
-        gl_Position = projectionMatrix
-            * modelViewMatrix
-            * vec4(position.x, position.y, position.z, 1.0);
-    }
+        uniform float u_time;
+        
+        void main() {
+            vec4 result;
+            
+            result = vec4(position.x, 2.0*sin(position.z/4.0 + u_time) + position.y, position.z, 1.0);
+            
+            gl_Position = projectionMatrix
+                * modelViewMatrix
+                * result;
+        }
     `;
 }
 
 export function getFragmentShader() {
     return `
-    void main() {
-        gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0);
-    }
+        uniform float u_time;
+         
+        void main() {
+            gl_FragColor = vec4(abs(sin(u_time)), 0.0, 0.0, 1.0);
+        }
     `;
 }
