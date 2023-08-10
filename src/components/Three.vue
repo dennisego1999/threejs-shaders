@@ -4,7 +4,7 @@ import {nextTick} from "vue";
 
 nextTick(() => {
   //Create new three.js scene
-  new Scene('three-canvas');
+  const scene = new Scene('three-canvas');
 });
 </script>
 

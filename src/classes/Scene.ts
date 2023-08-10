@@ -1,6 +1,8 @@
 import * as THREE from 'three';
+import {getFragmentShader, getVertexShader} from '../util/Shaders.ts';
 import {GUI} from 'dat.gui'
 import Stats from 'stats.js';
+
 export default class Scene {
     public canvas: HTMLElement | null;
     public scene: THREE.Scene | null;
@@ -102,7 +104,11 @@ export default class Scene {
 
         //Create a box
         const geometry = new THREE.BoxGeometry(2, 2, 2);
-        const material = new THREE.MeshNormalMaterial();
+        const material = new THREE.ShaderMaterial({
+            wireframe: true,
+            vertexShader: getVertexShader(),
+            fragmentShader: getFragmentShader(),
+        });
         this.box = new THREE.Mesh(geometry, material);
         this.box.castShadow = true;
         this.box.receiveShadow = true;
