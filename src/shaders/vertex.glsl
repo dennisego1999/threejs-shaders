@@ -1,11 +1,11 @@
 varying vec3 pos;
-uniform float u_time;
+uniform float uTime;
 
 void main() {
     vec4 result;
     pos = position;
 
-    result = vec4(position.x, 2.0*sin(position.z/4.0 + u_time) + position.y, position.z, 1.0);
+    result = vec4(position.x, 2.0*sin(position.z/3.0 + uTime) + position.y, position.z, 1.0);
 
     gl_Position = projectionMatrix
     * modelViewMatrix

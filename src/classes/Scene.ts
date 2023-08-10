@@ -35,7 +35,7 @@ export default class Scene {
         this.renderer = null;
         this.box = null;
         this.uniformData = {
-            u_time: {
+            uTime: {
                 type: 'f',
                 value: null,
             }
@@ -67,8 +67,8 @@ export default class Scene {
         //Setup event listeners
         this.setupEventListeners();
 
-        //Set the initial uniform data u_time value
-        this.uniformData.u_time.value = this.delta;
+        //Set the initial uniform data uTime value
+        this.uniformData.uTime.value = this.delta;
 
         //Start rendering
         this.animate();
@@ -122,7 +122,7 @@ export default class Scene {
         }
 
         //Create a box
-        const geometry = new THREE.BoxGeometry(2, 2, 2, 5, 5, 5);
+        const geometry = new THREE.BoxGeometry(2, 0.2, 2, 5, 5, 5);
         const material = new THREE.ShaderMaterial({
             uniforms: this.uniformData,
             wireframe: false,
@@ -185,7 +185,7 @@ export default class Scene {
         }
 
         //Update uniform data
-        this.uniformData.u_time.value = this.clock?.getElapsedTime() ?? 0;
+        this.uniformData.uTime.value = this.clock?.getElapsedTime() ?? 0;
 
         if(this.box) {
             //Rotate the box

@@ -4,7 +4,7 @@
 *
 */
 export type UniformData = {
-    u_time: uTime,
+    uTime: uTime,
 }
 
 
