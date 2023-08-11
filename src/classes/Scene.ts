@@ -10,7 +10,7 @@ export default class Scene {
     public scene: THREE.Scene | null;
     public camera: THREE.PerspectiveCamera | null;
     public renderer: THREE.WebGLRenderer | null;
-    public box: THREE.Mesh | null;
+    public shape: THREE.Mesh | null;
     public clock: THREE.Clock | null;
 
     private readonly fps: number;
@@ -33,7 +33,7 @@ export default class Scene {
         this.scene = null;
         this.camera = null;
         this.renderer = null;
-        this.box = null;
+        this.shape = null;
         this.uniformData = {
             uTime: {
                 type: 'f',
@@ -121,26 +121,25 @@ export default class Scene {
             return;
         }
 
-        //Create a box
-        const geometry = new THREE.BoxGeometry(2, 0.2, 2, 5, 5, 5);
+        //Create a shape
+        const geometry = new THREE.IcosahedronGeometry(2, 50);
         const material = new THREE.ShaderMaterial({
             uniforms: this.uniformData,
-            wireframe: false,
             vertexShader: vertexShader,
             fragmentShader: fragmentShader,
         });
-        this.box = new THREE.Mesh(geometry, material);
-        this.box.castShadow = true;
-        this.box.receiveShadow = true;
-        this.scene.add(this.box);
+        this.shape = new THREE.Mesh(geometry, material);
+        this.shape.castShadow = true;
+        this.shape.receiveShadow = true;
+        this.scene.add(this.shape);
 
         if(this.gui) {
             //Add to gui
-            const boxFolder = this.gui.addFolder('Box');
-            boxFolder.add(this.box.scale, 'x', 1, 3);
-            boxFolder.add(this.box.scale, 'y', 1, 3);
-            boxFolder.add(this.box.scale, 'z', 1, 3);
-            boxFolder.open();
+            const shapeFolder = this.gui.addFolder('Box');
+            shapeFolder.add(this.shape.scale, 'x', 1, 3);
+            shapeFolder.add(this.shape.scale, 'y', 1, 3);
+            shapeFolder.add(this.shape.scale, 'z', 1, 3);
+            shapeFolder.open();
         }
 
         //Add directional scene light
@@ -175,25 +174,19 @@ export default class Scene {
         //Enable stats
         this.stats = new Stats();
         this.stats.showPanel(0);
+
+        //Add stats container to body
         document.body.appendChild(this.stats.dom);
     }
 
-    render(delta: number) {
+    render() {
         //Early return
-        if(!this.scene || !this.box || !this.camera) {
+        if(!this.scene || !this.shape || !this.camera) {
             return
         }
 
         //Update uniform data
-        this.uniformData.uTime.value = this.clock?.getElapsedTime() ?? 0;
-
-        if(this.box) {
-            //Rotate the box
-            const rotationSpeed = 0.0002;
-            this.box.rotation.x += rotationSpeed * delta;
-            this.box.rotation.y += rotationSpeed * delta;
-            this.box.rotation.z += rotationSpeed * delta;
-        }
+        this.uniformData.uTime.value = this.clock?.getElapsedTime() ? this.clock?.getElapsedTime() * 0.2 : 0;
 
         //Render
         this.renderer?.render(this.scene, this.camera);
@@ -211,7 +204,7 @@ export default class Scene {
             this.then = now;
 
             //Render the frame
-            this.render(this.delta);
+            this.render();
         }
 
         //End stats
